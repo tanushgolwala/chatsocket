@@ -11,21 +11,18 @@ import (
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		return true // Allow all origins for local testing
+		return true
 	},
 }
 
-// Message defines the structure of a WebSocket message
 type Message struct {
-	To      string `json:"to"`      // Target client's unique ID
-	From    string `json:"from"`    // Sender's unique ID
-	Content string `json:"content"` // Actual message content
+	To      string `json:"to"`
+	From    string `json:"from"`
+	Content string `json:"content"`
 }
-
-// WebSocketServer manages the WebSocket connections
 type WebSocketServer struct {
-	clients map[string]*websocket.Conn // Map of unique IDs to WebSocket connections
-	lock    sync.Mutex                 // Ensures thread-safe access to clients map
+	clients map[string]*websocket.Conn
+	lock    sync.Mutex
 }
 
 // NewWebSocketServer initializes the server
@@ -77,7 +74,6 @@ func (s *WebSocketServer) handleConnections(w http.ResponseWriter, r *http.Reque
 		s.sendMessageToClient(message.To, msg)
 	}
 
-	// Remove the client from the map on disconnect
 	s.lock.Lock()
 	delete(s.clients, clientID)
 	s.lock.Unlock()
@@ -99,7 +95,7 @@ func (s *WebSocketServer) sendMessageToClient(clientID string, msg []byte) {
 	if err != nil {
 		fmt.Printf("Write error for client %s: %v\n", clientID, err)
 		conn.Close()
-		delete(s.clients, clientID) // Remove client on error
+		delete(s.clients, clientID)
 	}
 }
 
